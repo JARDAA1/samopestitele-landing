@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samopěstitelé - Propojujeme pěstitele se zákazníky</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #2E7D32;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .description {
+            font-size: 15px;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .features {
+            text-align: left;
+            margin-bottom: 40px;
+        }
+
+        .features h2 {
+            font-size: 20px;
+            color: #2E7D32;
+            margin-bottom: 15px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: #F5F5F5;
+            border-radius: 8px;
+        }
+
+        .feature-icon {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+
+        .feature-text {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .download-section {
+            margin-top: 40px;
+        }
+
+        .download-section h2 {
+            font-size: 22px;
+            color: #2E7D32;
+            margin-bottom: 20px;
+        }
+
+        .download-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .download-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px 30px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .android-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .ios-btn {
+            background: #000;
+            color: white;
+        }
+
+        .btn-icon {
+            font-size: 28px;
+            margin-right: 12px;
+        }
+
+        .coming-soon {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #FFB300;
+            color: white;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #E0E0E0;
+            color: #888;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+
+            .logo {
+                font-size: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🌱</div>
+        <h1>Samopěstitelé</h1>
+        <p class="subtitle">Propojujeme pěstitele se zákazníky</p>
+
+        <div class="description">
+            Objevte lokální farmáře a samopěstitele ve vašem okolí. Nakupujte čerstvé produkty přímo od výrobců, podporujte místní zemědělství a získejte přístup k nejčerstvějším surovinám z vašeho regionu.
+        </div>
+
+        <div class="features">
+            <h2>✨ Funkce aplikace</h2>
+            <div class="feature">
+                <span class="feature-icon">🗺️</span>
+                <span class="feature-text">Najdi farmáře/ku ve vašem okolí (5-50 km nebo neomezeně)</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">🔍</span>
+                <span class="feature-text">Vyhledávání podle produktů a kategorií</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">📍</span>
+                <span class="feature-text">Navigace k farmáři přes mapy</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">⭐</span>
+                <span class="feature-text">Oblíbení farmáři a historie nákupů</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">🛒</span>
+                <span class="feature-text">Košík a objednávky produktů</span>
+            </div>
+        </div>
+
+        <div class="download-section">
+            <h2>📱 Stáhnout aplikaci</h2>
+            <div class="download-buttons">
+                <a href="https://expo.dev/accounts/jardaa/projects/samopestitele-app/builds/d5ecf617-7b89-4af4-a4f8-fc6c4b65f0c5" class="download-btn android-btn" id="android-download">
+                    <span class="btn-icon">🤖</span>
+                    <span>Stáhnout pro Android</span>
+                </a>
+                <a href="#" class="download-btn ios-btn" id="ios-download">
+                    <span class="btn-icon">🍎</span>
+                    <span>Stáhnout pro iOS</span>
+                    <span class="coming-soon">Připravujeme</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2025 Samopěstitelé. Všechna práva vyhrazena.</p>
+            <p style="margin-top: 10px;">Kontakt: <a href="mailto:info@samopestitele.cz" style="color: #4CAF50;">info@samopestitele.cz</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('ios-download').addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('iOS aplikace je ve vývoji. Brzy bude k dispozici!');
+        });
+    </script>
+</body>
+</html>
