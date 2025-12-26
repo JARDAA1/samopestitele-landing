@@ -478,10 +478,8 @@
                 localStorage.setItem('farmarData', JSON.stringify(farmarResult.data));
                 console.log('✅ ÚSPĚCH! Farmář přihlášen:', farmarResult.data);
 
-                alert(`Vítejte!\n\nByli jste úspěšně přihlášeni jako ${farmarResult.data.nazev_farmy}.`);
-
-                // TODO: Přesměrovat na dashboard farmy
-                // window.location.href = 'dashboard.html';
+                // Přesměrovat na dashboard
+                window.location.href = 'dashboard.html';
             } catch (error) {
                 alert('Chyba\n\n' + error.message);
             }

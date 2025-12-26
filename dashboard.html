@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Samopěstitelé</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --orange: #f59e0b;
+            --orange-dark: #d97706;
+            --text-dark: #1f2937;
+            --text-gray: #6b7280;
+            --bg-light: #f9fafb;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .welcome {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .welcome h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .welcome p {
+            color: var(--text-gray);
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-gray);
+        }
+
+        .card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .info-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .info-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .info-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .info-row {
+            display: flex;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--text-gray);
+            min-width: 120px;
+        }
+
+        .info-value {
+            color: var(--text-dark);
+        }
+
+        .placeholder {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-gray);
+        }
+
+        .placeholder-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">🌱 Samopěstitelé</div>
+            <button class="logout-btn" onclick="odhlasit()">🚪 Odhlásit se</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="welcome">
+            <h1>🏪 <span id="farmName">Moje prodejna</span></h1>
+            <p>Vítejte zpět! Zde můžete spravovat svou farmu a produkty.</p>
+        </div>
+
+        <div class="cards">
+            <div class="card">
+                <h3>📦 Produkty</h3>
+                <div class="value" id="productCount">0</div>
+            </div>
+            <div class="card">
+                <h3>✅ Skladem</h3>
+                <div class="value" id="availableCount">0</div>
+            </div>
+            <div class="card">
+                <h3>🛒 Objednávky</h3>
+                <div class="value" id="orderCount">0</div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>📋 Informace o farmě</h2>
+            <div class="info-grid">
+                <div class="info-row">
+                    <div class="info-label">Farmář:</div>
+                    <div class="info-value" id="farmerName">-</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Telefon:</div>
+                    <div class="info-value" id="farmerPhone">-</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Email:</div>
+                    <div class="info-value" id="farmerEmail">-</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Město:</div>
+                    <div class="info-value" id="farmerCity">-</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="placeholder">
+            <div class="placeholder-icon">🚧</div>
+            <h3>Dashboard ve vývoji</h3>
+            <p>Správa produktů, objednávek a další funkce budou brzy k dispozici.</p>
+        </div>
+    </div>
+
+    <script>
+        // Zkontrolovat přihlášení
+        function checkLogin() {
+            const isLoggedIn = localStorage.getItem('farmarLoggedIn');
+            const farmarData = localStorage.getItem('farmarData');
+
+            if (!isLoggedIn || !farmarData) {
+                // Není přihlášen, přesměrovat na login
+                window.location.href = 'prodejna.html';
+                return;
+            }
+
+            // Načíst data
+            const farmer = JSON.parse(farmarData);
+            console.log('Farmář data:', farmer);
+
+            // Zobrazit data
+            document.getElementById('farmName').textContent = farmer.nazev_farmy || 'Moje prodejna';
+            document.getElementById('farmerName').textContent = farmer.jmeno || '-';
+            document.getElementById('farmerPhone').textContent = farmer.telefon || '-';
+            document.getElementById('farmerEmail').textContent = farmer.email || '-';
+            document.getElementById('farmerCity').textContent = farmer.mesto || '-';
+
+            // TODO: Načíst statistiky z databáze
+            // document.getElementById('productCount').textContent = ...
+            // document.getElementById('availableCount').textContent = ...
+            // document.getElementById('orderCount').textContent = ...
+        }
+
+        function odhlasit() {
+            if (confirm('Opravdu se chcete odhlásit?')) {
+                localStorage.removeItem('farmarLoggedIn');
+                localStorage.removeItem('farmarData');
+                window.location.href = 'prodejna.html';
+            }
+        }
+
+        // Spustit při načtení stránky
+        checkLogin();
+    </script>
+</body>
+</html>
