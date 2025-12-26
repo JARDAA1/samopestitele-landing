@@ -668,6 +668,12 @@
             document.body.style.overflow = ''; // Re-enable scroll
             document.getElementById('addProductForm').reset();
             selectedIcon = null;
+            editingProductId = null; // Reset editace
+
+            // Resetovat nadpis a tlačítko
+            document.querySelector('.modal-header h2').textContent = '📦 Přidat nový produkt';
+            document.getElementById('submitBtn').textContent = '✅ Přidat produkt';
+
             // Odznačit všechny ikony
             document.querySelectorAll('.icon-item').forEach(item => {
                 item.classList.remove('selected');
@@ -722,32 +728,60 @@
                 }
 
                 // Uložit produkt do databáze
-                const { data, error } = await getSupabaseClient()
-                    .from('produkty')
-                    .insert({
-                        pestitel_id: farmarData.id,
-                        nazev,
-                        popis,
-                        cena,
-                        jednotka,
-                        mnozstvi: null, // Zakomentováno - nepoužíváme
-                        kategorie,
-                        dostupnost,
-                        emoji: selectedIcon, // Uložit ikonu místo obrazku
-                    })
-                    .select()
-                    .single();
+                let data, error;
+
+                if (editingProductId) {
+                    // UPRAVIT existující produkt
+                    const result = await getSupabaseClient()
+                        .from('produkty')
+                        .update({
+                            nazev,
+                            popis,
+                            cena,
+                            jednotka,
+                            mnozstvi: null,
+                            kategorie,
+                            dostupnost,
+                            emoji: selectedIcon,
+                        })
+                        .eq('id', editingProductId)
+                        .select()
+                        .single();
+
+                    data = result.data;
+                    error = result.error;
+                } else {
+                    // PŘIDAT nový produkt
+                    const result = await getSupabaseClient()
+                        .from('produkty')
+                        .insert({
+                            pestitel_id: farmarData.id,
+                            nazev,
+                            popis,
+                            cena,
+                            jednotka,
+                            mnozstvi: null,
+                            kategorie,
+                            dostupnost,
+                            emoji: selectedIcon,
+                        })
+                        .select()
+                        .single();
+
+                    data = result.data;
+                    error = result.error;
+                }
 
                 if (error) {
                     console.error('Chyba při ukládání produktu:', error);
                     alert('Chyba při ukládání produktu: ' + error.message);
                     submitBtn.disabled = false;
-                    submitBtn.textContent = '✅ Přidat produkt';
+                    submitBtn.textContent = editingProductId ? '💾 Uložit změny' : '✅ Přidat produkt';
                     return;
                 }
 
                 console.log('Produkt úspěšně uložen:', data);
-                alert('✅ Produkt byl úspěšně přidán!');
+                alert(editingProductId ? '✅ Produkt byl úspěšně upraven!' : '✅ Produkt byl úspěšně přidán!');
 
                 // Zavřít modal a reload produktů
                 closeAddProductModal();
@@ -762,8 +796,54 @@
             }
         }
 
-        function editProduct(productId) {
-            alert('Funkce "Upravit produkt" bude brzy k dispozici.\n\nPro úpravu produktů použijte mobilní aplikaci.');
+        let editingProductId = null;
+
+        async function editProduct(productId) {
+            editingProductId = productId;
+
+            // Načíst data produktu
+            try {
+                const { data, error } = await getSupabaseClient()
+                    .from('produkty')
+                    .select('*')
+                    .eq('id', productId)
+                    .single();
+
+                if (error) {
+                    console.error('Chyba při načítání produktu:', error);
+                    alert('Chyba při načítání produktu');
+                    return;
+                }
+
+                // Naplnit formulář daty
+                document.getElementById('nazev').value = data.nazev || '';
+                document.getElementById('popis').value = data.popis || '';
+                document.getElementById('cena').value = data.cena || '';
+                document.getElementById('jednotka').value = data.jednotka || 'kg';
+                document.getElementById('kategorie').value = data.kategorie || '';
+                document.getElementById('dostupnost').checked = data.dostupnost;
+                selectedIcon = data.emoji || '📦';
+
+                // Změnit nadpis modalu
+                document.querySelector('.modal-header h2').textContent = '✏️ Upravit produkt';
+                document.getElementById('submitBtn').textContent = '💾 Uložit změny';
+
+                // Otevřít modal
+                showAddProduct();
+
+                // Označit vybranou ikonu
+                setTimeout(() => {
+                    document.querySelectorAll('.icon-item').forEach(item => {
+                        if (item.textContent === selectedIcon) {
+                            item.classList.add('selected');
+                        }
+                    });
+                }, 100);
+
+            } catch (error) {
+                console.error('Chyba:', error);
+                alert('Chyba při načítání produktu');
+            }
         }
 
         async function deleteProduct(productId, productName) {
