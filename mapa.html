@@ -551,7 +551,7 @@
             }
 
             farmerList.innerHTML = farmers.map(farmer => `
-                <div class="farmer-item" onclick="selectFarmer(${farmer.id})">
+                <div class="farmer-item" onclick="viewFarmerDetail(${farmer.id})">
                     <div class="farmer-name">${farmer.nazev_farmy || farmer.nazev || 'Farma'}</div>
                     <div class="farmer-city">
                         📍 ${farmer.mesto || 'Neznámé místo'}
