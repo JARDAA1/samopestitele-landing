@@ -260,24 +260,26 @@
         }
 
         .test-box {
-            background: #fff3cd;
-            border: 2px solid #ffa000;
+            background: #e8f5e9;
+            border: 2px solid var(--primary);
             padding: 1rem;
             border-radius: 12px;
             margin-bottom: 1.5rem;
+            text-align: center;
         }
 
         .test-text {
-            font-size: 0.75rem;
-            font-weight: bold;
-            color: #ff6f00;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--primary-dark);
             margin-bottom: 0.5rem;
         }
 
         .test-code {
-            font-size: 1.5rem;
+            font-size: 2rem;
             font-weight: bold;
-            color: #ff6f00;
+            color: var(--primary-dark);
+            letter-spacing: 0.5rem;
         }
 
         @media (max-width: 480px) {
@@ -338,10 +340,10 @@
                     Zadejte 4-místný kód, který jsme vám poslali na číslo <span id="zobrazTelefon"></span>
                 </p>
 
-                <!-- PRO TESTOVÁNÍ -->
+                <!-- Vývojový režim - PRO PRODUKCI ODSTRAŇTE -->
                 <div id="testBox" class="test-box" style="display: none;">
-                    <div class="test-text">🧪 TESTOVACÍ REŽIM</div>
-                    <div class="test-code">Váš kód: <span id="testCode"></span></div>
+                    <div class="test-text">📱 Ověřovací kód (dev mode)</div>
+                    <div class="test-code"><span id="testCode"></span></div>
                 </div>
 
                 <label class="label">SMS kód</label>
@@ -414,7 +416,7 @@
                 // Uložit kód pro testování
                 odeslanyKod = result.kod || '';
 
-                // Zobrazit kód v testovacím boxu
+                // DEV MODE: Zobrazit kód (v produkci se neposílá SMS, jen uloží do DB)
                 if (odeslanyKod) {
                     document.getElementById('testCode').textContent = odeslanyKod;
                     document.getElementById('testBox').style.display = 'block';
@@ -430,7 +432,7 @@
                 // Focus na input kódu
                 document.getElementById('smsKod').focus();
 
-                alert(`SMS odeslána ✓\n\nTestovací režim: Váš kód je ${odeslanyKod}\n\nV produkci dostanete SMS.`);
+                alert(`SMS kód byl odeslán ✓\n\nZadejte prosím 4-místný kód z SMS zprávy.`);
             } catch (error) {
                 alert('Chyba\n\n' + error.message);
             }
@@ -476,9 +478,9 @@
                 localStorage.setItem('farmarData', JSON.stringify(farmarResult.data));
                 console.log('✅ ÚSPĚCH! Farmář přihlášen:', farmarResult.data);
 
-                alert(`Úspěch!\n\nByli jste úspěšně přihlášeni jako ${farmarResult.data.nazev_farmy}.\n\nV produkční verzi by se zde zobrazila administrace farmy.`);
+                alert(`Vítejte!\n\nByli jste úspěšně přihlášeni jako ${farmarResult.data.nazev_farmy}.`);
 
-                // V produkci: přesměrovat na dashboard farmy
+                // TODO: Přesměrovat na dashboard farmy
                 // window.location.href = 'dashboard.html';
             } catch (error) {
                 alert('Chyba\n\n' + error.message);
