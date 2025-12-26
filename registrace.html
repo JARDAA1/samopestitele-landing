@@ -332,7 +332,7 @@
 
             <!-- KROK 1: Základní informace -->
             <div id="step1">
-                <p class="info-text">Vyplňte základní informace o vaší farmě. Všechny údaje můžete později upravit.</p>
+                <p class="info-text">Vyplňte základní informace o vaší farmě. Pole označená hvězdičkou (*) jsou povinná. Všechny údaje můžete později upravit.</p>
 
                 <label class="label">Název farmy *</label>
                 <input type="text" class="input" id="nazevFarmy" placeholder="např. Farma u Nováků">
@@ -343,7 +343,7 @@
                 <label class="label">Telefon *</label>
                 <input type="tel" class="input" id="telefon" placeholder="+420777123456">
 
-                <label class="label">Email</label>
+                <label class="label">Email (volitelné)</label>
                 <input type="email" class="input" id="email" placeholder="jan@farma.cz">
 
                 <label class="label">Město *</label>
@@ -560,7 +560,7 @@
                         nazev_farmy: formData.nazevFarmy,
                         jmeno: formData.jmeno,
                         telefon: formData.telefon,
-                        email: formData.email || null,
+                        email: formData.email || '', // Prázdný string místo null pro volitelné pole
                         mesto: formData.mesto
                     })
                     .select()
