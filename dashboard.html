@@ -160,6 +160,62 @@
             font-size: 4rem;
             margin-bottom: 1rem;
         }
+
+        .product-item {
+            background: var(--bg-light);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-info h4 {
+            margin-bottom: 0.25rem;
+        }
+
+        .product-price {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .product-status {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .btn-edit {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+        }
     </style>
 </head>
 <body>
@@ -213,12 +269,25 @@
             </div>
         </div>
 
-        <div class="placeholder">
-            <div class="placeholder-icon">🚧</div>
-            <h3>Dashboard ve vývoji</h3>
-            <p>Správa produktů, objednávek a další funkce budou brzy k dispozici.</p>
+        <div class="info-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2>📦 Moje produkty</h2>
+                <button class="logout-btn" style="background: var(--primary);" onclick="showAddProduct()">+ Přidat produkt</button>
+            </div>
+
+            <div id="productsList">
+                <div class="placeholder">
+                    <div class="placeholder-icon">📦</div>
+                    <h3>Zatím nemáte žádné produkty</h3>
+                    <p>Klikněte na "+ Přidat produkt" a začněte prodávat.</p>
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth.js"></script>
 
     <script>
         // Zkontrolovat přihlášení
@@ -243,10 +312,104 @@
             document.getElementById('farmerEmail').textContent = farmer.email || '-';
             document.getElementById('farmerCity').textContent = farmer.mesto || '-';
 
-            // TODO: Načíst statistiky z databáze
-            // document.getElementById('productCount').textContent = ...
-            // document.getElementById('availableCount').textContent = ...
-            // document.getElementById('orderCount').textContent = ...
+            // Načíst produkty
+            loadProducts(farmer.id);
+        }
+
+        async function loadProducts(farmarId) {
+            try {
+                console.log('Načítám produkty pro farmáře:', farmarId);
+
+                const { data, error } = await getSupabaseClient()
+                    .from('produkty')
+                    .select('*')
+                    .eq('pestitel_id', farmarId)
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('Chyba při načítání produktů:', error);
+                    return;
+                }
+
+                console.log('Produkty načteny:', data);
+
+                // Aktualizovat statistiky
+                document.getElementById('productCount').textContent = data.length;
+                document.getElementById('availableCount').textContent = data.filter(p => p.dostupnost).length;
+
+                // Zobrazit produkty
+                displayProducts(data);
+            } catch (error) {
+                console.error('Chyba:', error);
+            }
+        }
+
+        function displayProducts(products) {
+            const container = document.getElementById('productsList');
+
+            if (products.length === 0) {
+                container.innerHTML = `
+                    <div class="placeholder">
+                        <div class="placeholder-icon">📦</div>
+                        <h3>Zatím nemáte žádné produkty</h3>
+                        <p>Klikněte na "+ Přidat produkt" a začněte prodávat.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = products.map(product => `
+                <div class="product-item">
+                    <div class="product-info">
+                        <h4>${product.nazev}</h4>
+                        <div class="product-price">${product.cena} Kč / ${product.jednotka}</div>
+                        <div class="product-status">
+                            ${product.dostupnost ? '✅ Skladem' : '❌ Vyprodáno'}
+                            ${product.mnozstvi ? ` • ${product.mnozstvi} ${product.jednotka}` : ''}
+                        </div>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn-small btn-edit" onclick="editProduct('${product.id}')">✏️ Upravit</button>
+                        <button class="btn-small btn-delete" onclick="deleteProduct('${product.id}', '${product.nazev}')">🗑️ Smazat</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showAddProduct() {
+            alert('Funkce "Přidat produkt" bude brzy k dispozici.\n\nPro přidání produktů použijte mobilní aplikaci.');
+        }
+
+        function editProduct(productId) {
+            alert('Funkce "Upravit produkt" bude brzy k dispozici.\n\nPro úpravu produktů použijte mobilní aplikaci.');
+        }
+
+        async function deleteProduct(productId, productName) {
+            if (!confirm(`Opravdu chcete smazat produkt "${productName}"?`)) {
+                return;
+            }
+
+            try {
+                const { error } = await getSupabaseClient()
+                    .from('produkty')
+                    .delete()
+                    .eq('id', productId);
+
+                if (error) {
+                    console.error('Chyba při mazání produktu:', error);
+                    alert('Chyba při mazání produktu');
+                    return;
+                }
+
+                alert('Produkt byl úspěšně smazán');
+
+                // Reload produktů
+                const farmarData = JSON.parse(localStorage.getItem('farmarData'));
+                loadProducts(farmarData.id);
+            } catch (error) {
+                console.error('Chyba:', error);
+                alert('Chyba při mazání produktu');
+            }
         }
 
         function odhlasit() {
