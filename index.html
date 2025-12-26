@@ -31,7 +31,7 @@
             overflow-x: hidden;
         }
 
-        /* Hero Background Slideshow */
+        /* Hero Background - Static collage */
         .hero-background {
             position: absolute;
             top: 0;
@@ -40,32 +40,25 @@
             height: 100%;
             overflow: hidden;
             z-index: 0;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
         }
 
-        .hero-slide {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 100%;
+        .hero-image {
             background-size: cover;
             background-position: center;
-            opacity: 0;
-            transition: opacity 2s ease-in-out;
+            position: relative;
         }
 
-        .hero-slide.active {
-            opacity: 1;
-        }
-
-        .hero-slide::after {
+        .hero-image::after {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.85) 0%, rgba(99, 102, 241, 0.75) 100%);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.75) 0%, rgba(99, 102, 241, 0.65) 100%);
         }
 
         .hero-overlay {
@@ -74,8 +67,15 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.95) 100%);
+            background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.93) 100%);
             z-index: 1;
+        }
+
+        @media (max-width: 768px) {
+            .hero-background {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(3, 1fr);
+            }
         }
 
         /* Header */
@@ -503,12 +503,14 @@
 
     <!-- Hero Section -->
     <section class="hero">
-        <!-- Background Slideshow -->
+        <!-- Background - Static 3 images -->
         <div class="hero-background">
-            <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80');"></div>
-            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80');"></div>
-            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1560493676-04071c5f467b?w=1600&q=80');"></div>
-            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=80');"></div>
+            <!-- Vinohrad / Vinice -->
+            <div class="hero-image" style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80');"></div>
+            <!-- Sad s jablky -->
+            <div class="hero-image" style="background-image: url('https://images.unsplash.com/photo-1560493676-04071c5f467b?w=800&q=80');"></div>
+            <!-- Včelař -->
+            <div class="hero-image" style="background-image: url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80');"></div>
         </div>
         <div class="hero-overlay"></div>
 
@@ -683,19 +685,6 @@
                 }
             });
         });
-
-        // Hero background slideshow
-        const slides = document.querySelectorAll('.hero-slide');
-        let currentSlide = 0;
-
-        function nextSlide() {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
-        }
-
-        // Change slide every 5 seconds
-        setInterval(nextSlide, 5000);
     </script>
 </body>
 </html>
