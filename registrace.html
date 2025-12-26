@@ -561,7 +561,9 @@
                         jmeno: formData.jmeno,
                         telefon: formData.telefon,
                         email: formData.email || '', // Prázdný string místo null pro volitelné pole
-                        mesto: formData.mesto
+                        mesto: formData.mesto,
+                        gps_lat: 0, // Výchozí GPS souřadnice (farmář je může později upravit)
+                        gps_lng: 0
                     })
                     .select()
                     .single();
