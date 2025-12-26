@@ -308,6 +308,89 @@
             background: var(--primary-dark);
         }
 
+        /* Farmer Contact Info */
+        .farmer-contact-info {
+            background: #f0fdf4;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .farmer-contact-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-dark);
+        }
+
+        .contact-item a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .contact-item a:hover {
+            text-decoration: underline;
+        }
+
+        /* Optional Form Toggle */
+        .optional-form-section {
+            margin-top: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 1.5rem;
+        }
+
+        .form-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.75rem;
+            background: var(--bg-light);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            transition: background 0.3s;
+        }
+
+        .form-toggle:hover {
+            background: #e5e7eb;
+        }
+
+        .form-toggle-icon {
+            transition: transform 0.3s;
+        }
+
+        .form-toggle-icon.expanded {
+            transform: rotate(90deg);
+        }
+
+        .form-content {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .form-content.visible {
+            display: block;
+        }
+
+        .info-message {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+        }
+
         /* Responsive */
         @media (max-width: 968px) {
             .cart-layout {
@@ -400,34 +483,97 @@
                             <span>${calculateTotal()} Kč</span>
                         </div>
 
-                        <div class="customer-form">
-                            <div class="form-group">
-                                <label class="form-label">Vaše jméno *</label>
-                                <input type="text" class="form-input" id="customerName" placeholder="Jan Novák" required>
-                            </div>
+                        <div class="info-message">
+                            💡 <strong>Jak to funguje:</strong><br>
+                            Po dokončení objednávky obdrží farmář notifikaci a bude vás kontaktovat pro domluvení předání.
+                        </div>
 
-                            <div class="form-group">
-                                <label class="form-label">Telefon *</label>
-                                <input type="tel" class="form-input" id="customerPhone" placeholder="+420777123456" required>
-                            </div>
+                        ${renderFarmerContacts(itemsByFarmer)}
 
-                            <div class="form-group">
-                                <label class="form-label">Email (volitelné)</label>
-                                <input type="email" class="form-input" id="customerEmail" placeholder="jan@email.cz">
-                            </div>
+                        <button class="checkout-btn" onclick="checkout()">
+                            Dokončit objednávku
+                        </button>
 
-                            <div class="form-group">
-                                <label class="form-label">Poznámka k objednávce</label>
-                                <textarea class="form-textarea" id="orderNote" placeholder="Např. termín vyzvednutí, speciální požadavky..."></textarea>
+                        <div class="optional-form-section">
+                            <div class="form-toggle" onclick="toggleCustomerForm()">
+                                <span class="form-toggle-icon" id="formToggleIcon">▶</span>
+                                <span style="font-weight: 600;">Volitelné: Přidat své kontaktní údaje</span>
                             </div>
+                            <div class="form-content" id="customerFormContent">
+                                <div class="form-group">
+                                    <label class="form-label">Vaše jméno</label>
+                                    <input type="text" class="form-input" id="customerName" placeholder="Jan Novák">
+                                </div>
 
-                            <button class="checkout-btn" onclick="checkout()">
-                                Dokončit objednávku
-                            </button>
+                                <div class="form-group">
+                                    <label class="form-label">Telefon</label>
+                                    <input type="tel" class="form-input" id="customerPhone" placeholder="+420777123456">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-input" id="customerEmail" placeholder="jan@email.cz">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Poznámka k objednávce</label>
+                                    <textarea class="form-textarea" id="orderNote" placeholder="Např. termín vyzvednutí, speciální požadavky..."></textarea>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             `;
+        }
+
+        // Render farmer contacts
+        function renderFarmerContacts(itemsByFarmer) {
+            return Object.values(itemsByFarmer).map(group => {
+                const farmer = group.farmer;
+                return `
+                    <div class="farmer-contact-info">
+                        <h3>📞 Kontakt na farmáře: ${farmer.nazev_farmy || farmer.nazev}</h3>
+                        ${farmer.telefon ? `
+                            <div class="contact-item">
+                                <span>📱 Telefon:</span>
+                                <a href="tel:${farmer.telefon}">${farmer.telefon}</a>
+                            </div>
+                        ` : ''}
+                        ${farmer.email ? `
+                            <div class="contact-item">
+                                <span>✉️ Email:</span>
+                                <a href="mailto:${farmer.email}">${farmer.email}</a>
+                            </div>
+                        ` : ''}
+                        ${farmer.mesto ? `
+                            <div class="contact-item">
+                                <span>📍 Místo:</span>
+                                <span>${farmer.mesto}</span>
+                            </div>
+                        ` : ''}
+                        ${farmer.gps_lat && farmer.gps_lng && (farmer.gps_lat !== 0 || farmer.gps_lng !== 0) ? `
+                            <div class="contact-item">
+                                <span>🗺️</span>
+                                <a href="https://www.google.com/maps/dir/?api=1&destination=${farmer.gps_lat},${farmer.gps_lng}" target="_blank">Navigovat na farmu</a>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Toggle customer form
+        function toggleCustomerForm() {
+            const content = document.getElementById('customerFormContent');
+            const icon = document.getElementById('formToggleIcon');
+
+            if (content.classList.contains('visible')) {
+                content.classList.remove('visible');
+                icon.classList.remove('expanded');
+            } else {
+                content.classList.add('visible');
+                icon.classList.add('expanded');
+            }
         }
 
         // Render cart item
@@ -487,23 +633,43 @@
             localStorage.setItem('cart', JSON.stringify(cart));
         }
 
+        // Send push notification to farmer
+        async function sendPushNotification(farmer, orderDetails) {
+            // TODO: Implementovat push notifikace
+            // Možnosti:
+            // 1. Firebase Cloud Messaging (FCM)
+            // 2. OneSignal
+            // 3. Supabase Realtime + Service Worker
+
+            console.log('📲 Push notifikace pro farmáře:', {
+                farmer: farmer.nazev_farmy,
+                telefon: farmer.telefon,
+                orderDetails: orderDetails
+            });
+
+            // Placeholder pro budoucí implementaci
+            // await fetch('/api/send-notification', {
+            //     method: 'POST',
+            //     body: JSON.stringify({
+            //         farmerId: farmer.id,
+            //         message: `Nová objednávka za ${orderDetails.totalPrice} Kč`,
+            //         ...orderDetails
+            //     })
+            // });
+        }
+
         // Checkout
         async function checkout() {
-            const name = document.getElementById('customerName').value.trim();
-            const phone = document.getElementById('customerPhone').value.trim();
-            const email = document.getElementById('customerEmail').value.trim();
-            const note = document.getElementById('orderNote').value.trim();
+            // Volitelné údaje zákazníka - pouze pokud jsou vyplněny
+            const nameInput = document.getElementById('customerName');
+            const phoneInput = document.getElementById('customerPhone');
+            const emailInput = document.getElementById('customerEmail');
+            const noteInput = document.getElementById('orderNote');
 
-            // Validace
-            if (!name) {
-                alert('❌ Vyplňte prosím vaše jméno');
-                return;
-            }
-
-            if (!phone) {
-                alert('❌ Vyplňte prosím váš telefon');
-                return;
-            }
+            const name = nameInput ? nameInput.value.trim() : '';
+            const phone = phoneInput ? phoneInput.value.trim() : '';
+            const email = emailInput ? emailInput.value.trim() : '';
+            const note = noteInput ? noteInput.value.trim() : '';
 
             const btn = document.querySelector('.checkout-btn');
             btn.disabled = true;
@@ -521,21 +687,23 @@
                 });
 
                 // Create orders for each farmer
+                const farmerNames = [];
                 for (const [farmerId, items] of Object.entries(itemsByFarmer)) {
                     const farmer = items[0].farmer;
                     const totalPrice = calculateFarmerTotal(items);
+                    farmerNames.push(farmer.nazev_farmy || farmer.nazev);
 
-                    // Insert order
+                    // Insert order (customer info is optional)
                     const { data: order, error: orderError } = await getSupabaseClient()
                         .from('objednavky')
                         .insert({
                             pestitel_id: parseInt(farmerId),
-                            zakaznik_jmeno: name,
-                            zakaznik_telefon: phone,
+                            zakaznik_jmeno: name || null,
+                            zakaznik_telefon: phone || null,
                             stav: 'nova',
                             celkova_cena: totalPrice,
                             poznamka: note || null,
-                            zpusob_kontaktu: 'telefon'
+                            zpusob_kontaktu: phone ? 'telefon' : null
                         })
                         .select()
                         .single();
@@ -563,6 +731,16 @@
                             throw itemError;
                         }
                     }
+
+                    // Send push notification to farmer
+                    await sendPushNotification(farmer, {
+                        orderId: order.id,
+                        totalPrice: totalPrice,
+                        itemCount: items.length,
+                        customerName: name || 'Zákazník',
+                        customerPhone: phone || 'neuvedeno',
+                        note: note || ''
+                    });
                 }
 
                 // Clear cart
@@ -570,7 +748,17 @@
                 localStorage.removeItem('cart');
 
                 // Success message
-                alert(`✅ Objednávka byla úspěšně odeslána!\n\nFarmář vás bude kontaktovat na čísle: ${phone}`);
+                let successMessage = `✅ Objednávka byla úspěšně odeslána!\n\nFarmář obdržel notifikaci a bude vás kontaktovat.`;
+
+                if (farmerNames.length > 0) {
+                    successMessage += `\n\nObjednali jste od: ${farmerNames.join(', ')}`;
+                }
+
+                if (phone) {
+                    successMessage += `\n\nFarmář vás bude kontaktovat na čísle: ${phone}`;
+                }
+
+                alert(successMessage);
 
                 // Redirect
                 window.location.href = 'mapa.html';
