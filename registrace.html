@@ -556,6 +556,7 @@
                 const { data, error } = await getSupabaseClient()
                     .from('pestitele')
                     .insert({
+                        nazev: formData.nazevFarmy, // Přidáno pro kompatibilitu se schématem
                         nazev_farmy: formData.nazevFarmy,
                         jmeno: formData.jmeno,
                         telefon: formData.telefon,
