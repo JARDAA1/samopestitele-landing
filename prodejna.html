@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Moje prodejna - Samopěstitelé</title>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -377,10 +379,14 @@
         </div>
     </div>
 
+    <!-- Auth Script -->
+    <script src="auth.js"></script>
+
     <script>
+        let currentTelefon = '';
         let odeslanyKod = '';
 
-        function odeslatKod() {
+        async function odeslatKod() {
             const telefon = document.getElementById('telefon').value.trim();
 
             // Validace telefonu
@@ -389,28 +395,43 @@
                 return;
             }
 
-            // SIMULACE - v produkci by tady bylo volání API
-            // Pro testování používáme náhodný 4-místný kód
-            odeslanyKod = Math.floor(1000 + Math.random() * 9000).toString();
+            currentTelefon = telefon;
 
-            // Zobrazit kód v testovacím boxu
-            document.getElementById('testCode').textContent = odeslanyKod;
-            document.getElementById('testBox').style.display = 'block';
+            try {
+                // Odeslat kód přes Supabase
+                const result = await odeslatOverovaciKod(telefon, 'prihlaseni');
 
-            // Zobrazit telefon v kroku 2
-            document.getElementById('zobrazTelefon').textContent = telefon;
+                if (!result.success) {
+                    alert('Chyba\n\n' + (result.error || 'Nepodařilo se odeslat SMS'));
+                    return;
+                }
 
-            // Přepnout na krok 2
-            document.getElementById('step1').style.display = 'none';
-            document.getElementById('step2').style.display = 'block';
+                // Uložit kód pro testování
+                odeslanyKod = result.kod || '';
 
-            // Focus na input kódu
-            document.getElementById('smsKod').focus();
+                // Zobrazit kód v testovacím boxu
+                if (odeslanyKod) {
+                    document.getElementById('testCode').textContent = odeslanyKod;
+                    document.getElementById('testBox').style.display = 'block';
+                }
 
-            alert(`SMS odeslána ✓\n\nTestovací režim: Váš kód je ${odeslanyKod}\n\nV produkci dostanete SMS.`);
+                // Zobrazit telefon v kroku 2
+                document.getElementById('zobrazTelefon').textContent = telefon;
+
+                // Přepnout na krok 2
+                document.getElementById('step1').style.display = 'none';
+                document.getElementById('step2').style.display = 'block';
+
+                // Focus na input kódu
+                document.getElementById('smsKod').focus();
+
+                alert(`SMS odeslána ✓\n\nTestovací režim: Váš kód je ${odeslanyKod}\n\nV produkci dostanete SMS.`);
+            } catch (error) {
+                alert('Chyba\n\n' + error.message);
+            }
         }
 
-        function overitKod() {
+        async function overitKod() {
             const smsKod = document.getElementById('smsKod').value;
 
             if (smsKod.length !== 4) {
@@ -418,13 +439,33 @@
                 return;
             }
 
-            // SIMULACE - v produkci by tady bylo volání API
-            if (smsKod === odeslanyKod) {
-                alert('Úspěch!\n\nByli jste úspěšně přihlášeni.\n\nV produkční verzi by se zde zobrazila administrace farmy.');
+            try {
+                // Ověřit kód přes Supabase
+                const result = await overitSMSKod(currentTelefon, smsKod);
+
+                if (!result.valid) {
+                    alert('Chyba\n\n' + (result.error || 'Neplatný kód'));
+                    return;
+                }
+
+                // Načíst data farmáře
+                const farmarResult = await nacistFarmarePoTelefonu(currentTelefon);
+
+                if (!farmarResult.success) {
+                    alert('Chyba\n\nNepodařilo se načíst data farmáře');
+                    return;
+                }
+
+                // Uložit do localStorage
+                localStorage.setItem('farmarLoggedIn', 'true');
+                localStorage.setItem('farmarData', JSON.stringify(farmarResult.data));
+
+                alert(`Úspěch!\n\nByli jste úspěšně přihlášeni jako ${farmarResult.data.nazev_farmy}.\n\nV produkční verzi by se zde zobrazila administrace farmy.`);
+
                 // V produkci: přesměrovat na dashboard farmy
                 // window.location.href = 'dashboard.html';
-            } else {
-                alert('Chyba\n\nNeplatný kód. Zkuste to znovu.');
+            } catch (error) {
+                alert('Chyba\n\n' + error.message);
             }
         }
 
