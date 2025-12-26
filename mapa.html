@@ -496,7 +496,12 @@
 
             let filtered = allFarmers.filter(farmer => {
                 // Filtr podle vzdálenosti
-                if (distanceFilter !== null && farmer.distance !== null) {
+                if (distanceFilter !== null) {
+                    // Pokud je nastaven filtr vzdálenosti, ale farmář nemá GPS nebo uživatel nemá polohu
+                    if (farmer.distance === null) {
+                        return false; // Nezobrazovat farmáře bez GPS když je aktivní filtr vzdálenosti
+                    }
+                    // Pokud je farmář dál než vybraný perimetr
                     if (farmer.distance > distanceFilter) {
                         return false;
                     }
