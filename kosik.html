@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Košík - Samopěstitelé</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --secondary: #6366f1;
+            --text-dark: #1f2937;
+            --text-gray: #6b7280;
+            --bg-light: #f9fafb;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        /* Header */
+        header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .back-btn {
+            padding: 0.5rem 1rem;
+            background: var(--bg-light);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #e5e7eb;
+        }
+
+        /* Main */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: var(--text-dark);
+        }
+
+        .cart-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+        }
+
+        /* Cart Items */
+        .cart-items {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: var(--bg-light);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .item-emoji {
+            font-size: 4rem;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .item-farmer {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .item-price {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .item-controls {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quantity-btn {
+            width: 32px;
+            height: 32px;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .quantity-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .quantity-display {
+            width: 50px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .remove-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            transition: transform 0.3s;
+        }
+
+        .remove-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .item-total {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        /* Summary */
+        .cart-summary {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .summary-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .summary-row.total {
+            border-top: 2px solid var(--text-dark);
+            border-bottom: none;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+
+        .customer-form {
+            margin-top: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            margin-top: 1.5rem;
+        }
+
+        .checkout-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .checkout-btn:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem;
+            background: white;
+            border-radius: 16px;
+        }
+
+        .empty-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h2 {
+            margin-bottom: 1rem;
+        }
+
+        .continue-btn {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .continue-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .cart-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .cart-summary {
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">🌱 Samopěstitelé</div>
+            <a href="mapa.html" class="back-btn">← Zpět na mapu</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1 class="page-title">🛒 Váš košík</h1>
+
+        <div id="cartContent">
+            <!-- Content will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth.js"></script>
+
+    <script>
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        // Zobrazit košík
+        function displayCart() {
+            const container = document.getElementById('cartContent');
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🛒</div>
+                        <h2>Váš košík je prázdný</h2>
+                        <p>Prozkoumejte naše farmáře a začněte nakupovat!</p>
+                        <a href="mapa.html" class="continue-btn">Pokračovat v nákupu</a>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group by farmer
+            const itemsByFarmer = {};
+            cart.forEach(item => {
+                const farmerId = item.farmer.id;
+                if (!itemsByFarmer[farmerId]) {
+                    itemsByFarmer[farmerId] = {
+                        farmer: item.farmer,
+                        items: []
+                    };
+                }
+                itemsByFarmer[farmerId].items.push(item);
+            });
+
+            container.innerHTML = `
+                <div class="cart-layout">
+                    <div class="cart-items">
+                        ${Object.values(itemsByFarmer).map(group => `
+                            <div style="margin-bottom: 2rem;">
+                                <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--text-dark);">
+                                    🚜 ${group.farmer.nazev_farmy || group.farmer.nazev || 'Farma'}
+                                </h3>
+                                ${group.items.map((item, index) => renderCartItem(item, cart.indexOf(item))).join('')}
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="cart-summary">
+                        <h2 class="summary-title">📋 Shrnutí objednávky</h2>
+
+                        ${Object.values(itemsByFarmer).map(group => `
+                            <div class="summary-row">
+                                <span>${group.farmer.nazev_farmy || group.farmer.nazev}</span>
+                                <span>${calculateFarmerTotal(group.items)} Kč</span>
+                            </div>
+                        `).join('')}
+
+                        <div class="summary-row total">
+                            <span>Celkem</span>
+                            <span>${calculateTotal()} Kč</span>
+                        </div>
+
+                        <div class="customer-form">
+                            <div class="form-group">
+                                <label class="form-label">Vaše jméno *</label>
+                                <input type="text" class="form-input" id="customerName" placeholder="Jan Novák" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Telefon *</label>
+                                <input type="tel" class="form-input" id="customerPhone" placeholder="+420777123456" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Email (volitelné)</label>
+                                <input type="email" class="form-input" id="customerEmail" placeholder="jan@email.cz">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Poznámka k objednávce</label>
+                                <textarea class="form-textarea" id="orderNote" placeholder="Např. termín vyzvednutí, speciální požadavky..."></textarea>
+                            </div>
+
+                            <button class="checkout-btn" onclick="checkout()">
+                                Dokončit objednávku
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render cart item
+        function renderCartItem(item, index) {
+            const product = item.product;
+            const itemTotal = product.cena * item.quantity;
+
+            return `
+                <div class="cart-item">
+                    <div class="item-emoji">${product.emoji || '📦'}</div>
+                    <div class="item-details">
+                        <div class="item-name">${product.nazev}</div>
+                        <div class="item-farmer">📍 ${item.farmer.mesto || 'Neznámé místo'}</div>
+                        <div class="item-price">${product.cena} Kč / ${product.jednotka}</div>
+                    </div>
+                    <div class="item-controls">
+                        <button class="remove-btn" onclick="removeItem(${index})" title="Odebrat">🗑️</button>
+                        <div class="quantity-controls">
+                            <button class="quantity-btn" onclick="updateQuantity(${index}, -1)">-</button>
+                            <div class="quantity-display">${item.quantity}</div>
+                            <button class="quantity-btn" onclick="updateQuantity(${index}, 1)">+</button>
+                        </div>
+                        <div class="item-total">${itemTotal} Kč</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Calculate total for farmer
+        function calculateFarmerTotal(items) {
+            return items.reduce((sum, item) => sum + (item.product.cena * item.quantity), 0);
+        }
+
+        // Calculate total
+        function calculateTotal() {
+            return cart.reduce((sum, item) => sum + (item.product.cena * item.quantity), 0);
+        }
+
+        // Update quantity
+        function updateQuantity(index, delta) {
+            cart[index].quantity = Math.max(1, cart[index].quantity + delta);
+            saveCart();
+            displayCart();
+        }
+
+        // Remove item
+        function removeItem(index) {
+            if (confirm('Opravdu chcete odstranit tento produkt z košíku?')) {
+                cart.splice(index, 1);
+                saveCart();
+                displayCart();
+            }
+        }
+
+        // Save cart
+        function saveCart() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+
+        // Checkout
+        async function checkout() {
+            const name = document.getElementById('customerName').value.trim();
+            const phone = document.getElementById('customerPhone').value.trim();
+            const email = document.getElementById('customerEmail').value.trim();
+            const note = document.getElementById('orderNote').value.trim();
+
+            // Validace
+            if (!name) {
+                alert('❌ Vyplňte prosím vaše jméno');
+                return;
+            }
+
+            if (!phone) {
+                alert('❌ Vyplňte prosím váš telefon');
+                return;
+            }
+
+            const btn = document.querySelector('.checkout-btn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Odesílám objednávku...';
+
+            try {
+                // Group items by farmer
+                const itemsByFarmer = {};
+                cart.forEach(item => {
+                    const farmerId = item.farmer.id;
+                    if (!itemsByFarmer[farmerId]) {
+                        itemsByFarmer[farmerId] = [];
+                    }
+                    itemsByFarmer[farmerId].push(item);
+                });
+
+                // Create orders for each farmer
+                for (const [farmerId, items] of Object.entries(itemsByFarmer)) {
+                    const farmer = items[0].farmer;
+                    const totalPrice = calculateFarmerTotal(items);
+
+                    // Insert order
+                    const { data: order, error: orderError } = await getSupabaseClient()
+                        .from('objednavky')
+                        .insert({
+                            pestitel_id: parseInt(farmerId),
+                            zakaznik_jmeno: name,
+                            zakaznik_telefon: phone,
+                            stav: 'nova',
+                            celkova_cena: totalPrice,
+                            poznamka: note || null,
+                            zpusob_kontaktu: 'telefon'
+                        })
+                        .select()
+                        .single();
+
+                    if (orderError) {
+                        console.error('Chyba při vytváření objednávky:', orderError);
+                        throw orderError;
+                    }
+
+                    // Insert order items
+                    for (const item of items) {
+                        const { error: itemError } = await getSupabaseClient()
+                            .from('objednavky_polozky')
+                            .insert({
+                                objednavka_id: order.id,
+                                produkt_id: item.product.id,
+                                nazev_produktu: item.product.nazev,
+                                cena: item.product.cena,
+                                mnozstvi: item.quantity,
+                                jednotka: item.product.jednotka
+                            });
+
+                        if (itemError) {
+                            console.error('Chyba při přidávání položky:', itemError);
+                            throw itemError;
+                        }
+                    }
+                }
+
+                // Clear cart
+                cart = [];
+                localStorage.removeItem('cart');
+
+                // Success message
+                alert(`✅ Objednávka byla úspěšně odeslána!\n\nFarmář vás bude kontaktovat na čísle: ${phone}`);
+
+                // Redirect
+                window.location.href = 'mapa.html';
+
+            } catch (error) {
+                console.error('Chyba při odesílání objednávky:', error);
+                alert('❌ Chyba při odesílání objednávky: ' + error.message);
+                btn.disabled = false;
+                btn.textContent = 'Dokončit objednávku';
+            }
+        }
+
+        // Load on page load
+        window.addEventListener('load', () => {
+            displayCart();
+        });
+    </script>
+</body>
+</html>
