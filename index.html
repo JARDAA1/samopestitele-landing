@@ -298,55 +298,139 @@
             margin: 0 auto;
         }
 
-        .features-grid {
+        /* Main CTA Cards */
+        .main-cta-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
         }
 
-        .feature-card {
+        .main-cta-card {
             background: white;
-            padding: 2rem;
-            border-radius: 16px;
-            box-shadow: var(--shadow-sm);
+            padding: 3rem 2.5rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
             transition: all 0.3s ease;
-            border: 1px solid #f3f4f6;
+            border: 2px solid #f3f4f6;
+            display: flex;
+            flex-direction: column;
         }
 
-        .feature-card:hover {
-            transform: translateY(-4px);
+        .main-cta-card:hover {
+            transform: translateY(-6px);
             box-shadow: var(--shadow-lg);
+        }
+
+        .customer-card:hover {
             border-color: var(--primary);
         }
 
-        .feature-icon {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, #ecfdf5 0%, #dbeafe 100%);
-            border-radius: 12px;
+        .farmer-card:hover {
+            border-color: #f59e0b;
+        }
+
+        .main-cta-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1.25rem;
+            margin-bottom: 1.5rem;
         }
 
-        .feature-icon svg {
-            width: 28px;
-            height: 28px;
+        .main-cta-icon svg {
+            width: 40px;
+            height: 40px;
             stroke: var(--primary);
         }
 
-        .feature-title {
-            font-size: 1.25rem;
-            font-weight: 700;
+        .farmer-icon {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        }
+
+        .farmer-icon svg {
+            stroke: #f59e0b;
+        }
+
+        .main-cta-title {
+            font-size: 1.75rem;
+            font-weight: 800;
             color: var(--text-dark);
             margin-bottom: 0.75rem;
         }
 
-        .feature-text {
+        .main-cta-description {
+            color: var(--text-gray);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .sub-features {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            flex-grow: 1;
+        }
+
+        .sub-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
             color: var(--text-gray);
             font-size: 0.9375rem;
-            line-height: 1.6;
+        }
+
+        .sub-feature svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .main-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            margin-top: auto;
+        }
+
+        .customer-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .customer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .farmer-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .farmer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .main-cta-btn svg {
+            width: 20px;
+            height: 20px;
         }
 
         /* Download Section */
@@ -548,74 +632,68 @@
         </div>
     </section>
 
-    <!-- Features Section -->
+    <!-- Main CTA Section -->
     <section class="features" id="features">
         <div class="section-header">
-            <div class="section-badge">✨ Funkce</div>
-            <h2 class="section-title">Vše, co potřebujete</h2>
+            <h2 class="section-title">Jak chcete pokračovat?</h2>
             <p class="section-description">
-                Aplikace nabízí kompletní řešení pro nákup lokálních produktů s moderním a intuitivním rozhraním.
+                Vyberte si, co vás zajímá
             </p>
         </div>
 
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                        <circle cx="12" cy="10" r="3"/>
-                    </svg>
-                </div>
-                <h3 class="feature-title">Mapa farmářů</h3>
-                <p class="feature-text">Najděte pěstitele ve vzdálenosti 5-50 km nebo v celé ČR. Přehledná mapa s filtry podle produktů.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-                        <circle cx="11" cy="11" r="8"/>
-                        <path d="m21 21-4.35-4.35"/>
-                    </svg>
-                </div>
-                <h3 class="feature-title">Pokročilé vyhledávání</h3>
-                <p class="feature-text">Hledejte podle produktů, kategorií nebo názvu farmáře. Rychlé a přesné výsledky.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">
+        <!-- Main CTA Cards -->
+        <div class="main-cta-grid">
+            <!-- Chci nakupovat -->
+            <div class="main-cta-card customer-card">
+                <div class="main-cta-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
                         <circle cx="9" cy="21" r="1"/>
                         <circle cx="20" cy="21" r="1"/>
                         <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
                     </svg>
                 </div>
-                <h3 class="feature-title">Košík a objednávky</h3>
-                <p class="feature-text">Přidávejte produkty do košíku, vytvářejte objednávky a sledujte jejich historii.</p>
-            </div>
+                <h3 class="main-cta-title">Chci nakupovat</h3>
+                <p class="main-cta-description">Hledám čerstvé produkty od lokálních farmářů ve svém okolí</p>
 
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                    </svg>
+                <div class="sub-features">
+                    <div class="sub-feature">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        <span>Mapa farmářů v okolí</span>
+                    </div>
+                    <div class="sub-feature">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        <span>Vyhledávání podle produktů</span>
+                    </div>
+                    <div class="sub-feature">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        <span>Košík a objednávky</span>
+                    </div>
+                    <div class="sub-feature">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        <span>Navigace k farmáři</span>
+                    </div>
                 </div>
-                <h3 class="feature-title">Oblíbení farmáři</h3>
-                <p class="feature-text">Ukládejte si své oblíbené pěstitele pro rychlý přístup k jejich produktům.</p>
-            </div>
 
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                        <circle cx="12" cy="10" r="3"/>
+                <a href="https://expo.dev/accounts/jardaa/projects/samopestitele-app/builds/d5ecf617-7b89-4af4-a4f8-fc6c4b65f0c5" class="main-cta-btn customer-btn">
+                    Stáhnout aplikaci
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                        <polyline points="12 5 19 12 12 19"/>
                     </svg>
-                </div>
-                <h3 class="feature-title">Navigace</h3>
-                <p class="feature-text">Přímá navigace k farmáři přes Google Maps nebo Apple Maps.</p>
+                </a>
             </div>
 
-            <div class="feature-card">
-                <div class="feature-icon">
+            <!-- Jsem farmář -->
+            <div class="main-cta-card farmer-card">
+                <div class="main-cta-icon farmer-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
                         <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                         <circle cx="8.5" cy="7" r="4"/>
@@ -623,8 +701,43 @@
                         <line x1="23" y1="11" x2="17" y2="11"/>
                     </svg>
                 </div>
-                <h3 class="feature-title">Vlastní farma</h3>
-                <p class="feature-text">Jste pěstitel? Zaregistrujte se a prezentujte své produkty tisícům zákazníků.</p>
+                <h3 class="main-cta-title">Jsem farmář/ka</h3>
+                <p class="main-cta-description">Chci nabízet své produkty a oslovit nové zákazníky</p>
+
+                <div class="sub-features">
+                    <div class="sub-feature">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        <span>Vlastní profil farmy</span>
+                    </div>
+                    <div class="sub-feature">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        <span>Správa produktů a cen</span>
+                    </div>
+                    <div class="sub-feature">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        <span>Přehled objednávek</span>
+                    </div>
+                    <div class="sub-feature">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        <span>Oslovte tisíce zákazníků</span>
+                    </div>
+                </div>
+
+                <a href="https://expo.dev/accounts/jardaa/projects/samopestitele-app/builds/d5ecf617-7b89-4af4-a4f8-fc6c4b65f0c5" class="main-cta-btn farmer-btn">
+                    Zaregistrovat farmu
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                        <polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                </a>
             </div>
         </div>
     </section>
