@@ -31,7 +31,7 @@
             overflow-x: hidden;
         }
 
-        /* Hero Background - Static collage */
+        /* Hero Background - Single image */
         .hero-background {
             position: absolute;
             top: 0;
@@ -40,18 +40,13 @@
             height: 100%;
             overflow: hidden;
             z-index: 0;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0;
-        }
-
-        .hero-image {
+            background-image: url('images/back1.png');
             background-size: cover;
             background-position: center;
-            position: relative;
+            background-repeat: no-repeat;
         }
 
-        .hero-image::after {
+        .hero-background::after {
             content: '';
             position: absolute;
             top: 0;
@@ -69,13 +64,6 @@
             bottom: 0;
             background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.93) 100%);
             z-index: 1;
-        }
-
-        @media (max-width: 768px) {
-            .hero-background {
-                grid-template-columns: 1fr;
-                grid-template-rows: repeat(3, 1fr);
-            }
         }
 
         /* Header */
@@ -594,15 +582,8 @@
 
     <!-- Hero Section -->
     <section class="hero">
-        <!-- Background - Static 3 images -->
-        <div class="hero-background">
-            <!-- Vinohrad / Vinice -->
-            <div class="hero-image" style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80');"></div>
-            <!-- Sad s jablky -->
-            <div class="hero-image" style="background-image: url('https://images.unsplash.com/photo-1560493676-04071c5f467b?w=800&q=80');"></div>
-            <!-- Včelař -->
-            <div class="hero-image" style="background-image: url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80');"></div>
-        </div>
+        <!-- Background - Your custom image -->
+        <div class="hero-background"></div>
         <div class="hero-overlay"></div>
 
         <div class="hero-content">
