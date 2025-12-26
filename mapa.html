@@ -111,6 +111,46 @@
             border-color: var(--primary);
         }
 
+        .distance-filter {
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+        }
+
+        .distance-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+
+        .distance-btn {
+            padding: 0.5rem;
+            border: 2px solid #e5e7eb;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: var(--text-dark);
+        }
+
+        .distance-btn:hover {
+            border-color: var(--primary);
+            background: var(--bg-light);
+        }
+
+        .distance-btn.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
         .farmer-list {
             display: flex;
             flex-direction: column;
@@ -281,6 +321,20 @@
         <div class="sidebar">
             <h2>📍 Farmáři v okolí</h2>
             <input type="text" class="search-box" id="searchBox" placeholder="🔍 Hledat farmáře nebo produkt...">
+
+            <!-- Distance Filter -->
+            <div class="distance-filter">
+                <div class="filter-label">📏 Vzdálenost od mé polohy</div>
+                <div class="distance-buttons">
+                    <button class="distance-btn" onclick="setDistanceFilter(5)">Do 5 km</button>
+                    <button class="distance-btn" onclick="setDistanceFilter(10)">Do 10 km</button>
+                    <button class="distance-btn" onclick="setDistanceFilter(20)">Do 20 km</button>
+                    <button class="distance-btn" onclick="setDistanceFilter(30)">Do 30 km</button>
+                    <button class="distance-btn" onclick="setDistanceFilter(50)">Do 50 km</button>
+                    <button class="distance-btn active" onclick="setDistanceFilter(null)">Neomezeně</button>
+                </div>
+            </div>
+
             <div id="farmerList" class="farmer-list">
                 <div class="loading">
                     <div class="spinner"></div>
@@ -306,6 +360,8 @@
         let markers = [];
         let allFarmers = [];
         let selectedFarmer = null;
+        let userLocation = null;
+        let distanceFilter = null; // null = neomezeně, jinak číslo v km
 
         // Inicializace mapy
         function initMap() {
@@ -323,6 +379,7 @@
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         const { latitude, longitude } = position.coords;
+                        userLocation = { lat: latitude, lng: longitude };
                         map.setView([latitude, longitude], 10);
 
                         // Přidat značku uživatele
@@ -336,9 +393,38 @@
                     },
                     () => {
                         console.log('Nepodařilo se získat polohu uživatele');
+                        userLocation = null;
                     }
                 );
             }
+        }
+
+        // Výpočet vzdálenosti mezi dvěma GPS body v km (Haversine formula)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Poloměr Země v km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = R * c;
+            return distance;
+        }
+
+        // Nastavit filtr vzdálenosti
+        function setDistanceFilter(distance) {
+            distanceFilter = distance;
+
+            // Update active button
+            document.querySelectorAll('.distance-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Filtrovat a zobrazit farmáře
+            applyFilters();
         }
 
         // Načíst farmáře z databáze
@@ -373,7 +459,7 @@
                     return;
                 }
 
-                // Načíst produkty pro každého farmáře
+                // Načíst produkty pro každého farmáře a vypočítat vzdálenost
                 for (let farmer of allFarmers) {
                     const { data: products } = await getSupabaseClient()
                         .from('produkty')
@@ -383,13 +469,66 @@
                         .limit(3);
 
                     farmer.products = products || [];
+
+                    // Vypočítat vzdálenost od uživatele
+                    if (userLocation && farmer.gps_lat && farmer.gps_lng &&
+                        (farmer.gps_lat !== 0 || farmer.gps_lng !== 0)) {
+                        farmer.distance = calculateDistance(
+                            userLocation.lat,
+                            userLocation.lng,
+                            farmer.gps_lat,
+                            farmer.gps_lng
+                        );
+                    } else {
+                        farmer.distance = null;
+                    }
                 }
 
-                displayFarmers(allFarmers);
-                addMarkersToMap(allFarmers);
+                applyFilters();
             } catch (error) {
                 console.error('Chyba:', error);
             }
+        }
+
+        // Aplikovat všechny filtry
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+
+            let filtered = allFarmers.filter(farmer => {
+                // Filtr podle vzdálenosti
+                if (distanceFilter !== null && farmer.distance !== null) {
+                    if (farmer.distance > distanceFilter) {
+                        return false;
+                    }
+                }
+
+                // Filtr podle vyhledávání
+                if (searchTerm) {
+                    const nameMatch = (farmer.nazev_farmy || farmer.nazev || '').toLowerCase().includes(searchTerm);
+                    const cityMatch = (farmer.mesto || '').toLowerCase().includes(searchTerm);
+                    const productMatch = farmer.products && farmer.products.some(p =>
+                        p.nazev.toLowerCase().includes(searchTerm)
+                    );
+
+                    if (!nameMatch && !cityMatch && !productMatch) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            // Seřadit podle vzdálenosti (nejbližší první)
+            if (userLocation) {
+                filtered.sort((a, b) => {
+                    if (a.distance === null) return 1;
+                    if (b.distance === null) return -1;
+                    return a.distance - b.distance;
+                });
+            }
+
+            displayFarmers(filtered);
+            addMarkersToMap(filtered);
         }
 
         // Zobrazit farmáře v sidebaru
@@ -409,7 +548,10 @@
             farmerList.innerHTML = farmers.map(farmer => `
                 <div class="farmer-item" onclick="selectFarmer(${farmer.id})">
                     <div class="farmer-name">${farmer.nazev_farmy || farmer.nazev || 'Farma'}</div>
-                    <div class="farmer-city">📍 ${farmer.mesto || 'Neznámé místo'}</div>
+                    <div class="farmer-city">
+                        📍 ${farmer.mesto || 'Neznámé místo'}
+                        ${farmer.distance !== null ? ` • ${farmer.distance.toFixed(1)} km` : ''}
+                    </div>
                     ${farmer.products && farmer.products.length > 0 ? `
                         <div class="farmer-products">
                             ${farmer.products.map(p => `
@@ -483,21 +625,8 @@
         }
 
         // Vyhledávání
-        document.getElementById('searchBox').addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-
-            const filtered = allFarmers.filter(farmer => {
-                const nameMatch = (farmer.nazev_farmy || farmer.nazev || '').toLowerCase().includes(searchTerm);
-                const cityMatch = (farmer.mesto || '').toLowerCase().includes(searchTerm);
-                const productMatch = farmer.products && farmer.products.some(p =>
-                    p.nazev.toLowerCase().includes(searchTerm)
-                );
-
-                return nameMatch || cityMatch || productMatch;
-            });
-
-            displayFarmers(filtered);
-            addMarkersToMap(filtered);
+        document.getElementById('searchBox').addEventListener('input', () => {
+            applyFilters();
         });
 
         // Spustit při načtení stránky
