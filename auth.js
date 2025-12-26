@@ -2,9 +2,14 @@
 const SUPABASE_URL = 'https://ozxzowfzhdulofkxniji.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96eHpvd2Z6aGR1bG9ma3huaWppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNTg5MDMsImV4cCI6MjA4MDkzNDkwM30.ZfDrCvq7pCX6Y9RQm7MNFyuOMSeH3iVQUhRaoXBAu9M';
 
-// Vytvoření Supabase clienta pomocí CDN
-const { createClient } = window.supabase;
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Funkce pro získání Supabase clienta (lazy initialization)
+function getSupabaseClient() {
+    if (!window.supabaseClient) {
+        const { createClient } = window.supabase;
+        window.supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+    return window.supabaseClient;
+}
 
 /**
  * Generuje náhodný 4-místný kód
@@ -22,7 +27,7 @@ async function ulozitSMSKod(telefon, kod, typ = 'prihlaseni') {
         const vyprsiV = new Date();
         vyprsiV.setMinutes(vyprsiV.getMinutes() + 10);
 
-        const { error } = await supabaseClient
+        const { error } = await getSupabaseClient()
             .from('sms_overovaci_kody')
             .insert({
                 telefon,
@@ -51,7 +56,7 @@ async function overitSMSKod(telefon, kod) {
     try {
         // Najdi platný nepoužitý kód
         const currentTime = new Date().toISOString();
-        const { data, error } = await supabaseClient
+        const { data, error } = await getSupabaseClient()
             .from('sms_overovaci_kody')
             .select('*')
             .eq('telefon', telefon)
@@ -67,7 +72,7 @@ async function overitSMSKod(telefon, kod) {
         }
 
         // Označ kód jako použitý
-        await supabaseClient
+        await getSupabaseClient()
             .from('sms_overovaci_kody')
             .update({ pouzity: true })
             .eq('id', data.id);
@@ -84,7 +89,7 @@ async function overitSMSKod(telefon, kod) {
  */
 async function existujeFarmar(telefon) {
     try {
-        const { data, error } = await supabaseClient
+        const { data, error } = await getSupabaseClient()
             .from('pestitele')
             .select('id')
             .eq('telefon', telefon)
@@ -101,7 +106,7 @@ async function existujeFarmar(telefon) {
  */
 async function nacistFarmarePoTelefonu(telefon) {
     try {
-        const { data, error } = await supabaseClient
+        const { data, error } = await getSupabaseClient()
             .from('pestitele')
             .select('id, nazev_farmy, jmeno, telefon, email, mesto')
             .eq('telefon', telefon)
