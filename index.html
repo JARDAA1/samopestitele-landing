@@ -418,6 +418,50 @@
             height: 20px;
         }
 
+        /* Farmer Buttons */
+        .farmer-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: auto;
+        }
+
+        .farmer-register-btn,
+        .farmer-login-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+        }
+
+        .farmer-register-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .farmer-register-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .farmer-login-btn {
+            background: white;
+            color: #f59e0b;
+            border: 2px solid #f59e0b;
+        }
+
+        .farmer-login-btn:hover {
+            background: #fef3c7;
+            transform: translateY(-2px);
+        }
+
         /* Download Section */
         .download-section {
             max-width: 1200px;
@@ -684,13 +728,14 @@
                     </div>
                 </div>
 
-                <a href="https://expo.dev/accounts/jardaa/projects/samopestitele-app/builds/d5ecf617-7b89-4af4-a4f8-fc6c4b65f0c5" class="main-cta-btn farmer-btn">
-                    Vstoupit
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="5" y1="12" x2="19" y2="12"/>
-                        <polyline points="12 5 19 12 12 19"/>
-                    </svg>
-                </a>
+                <div class="farmer-buttons">
+                    <a href="https://expo.dev/accounts/jardaa/projects/samopestitele-app/builds/d5ecf617-7b89-4af4-a4f8-fc6c4b65f0c5" class="farmer-register-btn">
+                        📝 Zaregistrovat
+                    </a>
+                    <a href="https://expo.dev/accounts/jardaa/projects/samopestitele-app/builds/d5ecf617-7b89-4af4-a4f8-fc6c4b65f0c5" class="farmer-login-btn">
+                        🏪 Moje prodejna
+                    </a>
+                </div>
             </div>
         </div>
     </section>
