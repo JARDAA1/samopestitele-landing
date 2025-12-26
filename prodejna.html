@@ -388,9 +388,12 @@
 
         async function odeslatKod() {
             const telefon = document.getElementById('telefon').value.trim();
+            console.log('=== KROK 1: Odesílání SMS kódu ===');
+            console.log('Telefon:', telefon);
 
             // Validace telefonu
             if (!telefon.match(/^\+420\d{9}$/)) {
+                console.error('Neplatný formát telefonu');
                 alert('Zadejte platný telefon ve formátu +420xxxxxxxxx');
                 return;
             }
@@ -398,8 +401,10 @@
             currentTelefon = telefon;
 
             try {
+                console.log('Volám odeslatOverovaciKod()...');
                 // Odeslat kód přes Supabase
                 const result = await odeslatOverovaciKod(telefon, 'prihlaseni');
+                console.log('Výsledek odeslatOverovaciKod:', result);
 
                 if (!result.success) {
                     alert('Chyba\n\n' + (result.error || 'Nepodařilo se odeslat SMS'));
@@ -433,15 +438,21 @@
 
         async function overitKod() {
             const smsKod = document.getElementById('smsKod').value;
+            console.log('=== KROK 2: Ověření SMS kódu ===');
+            console.log('Telefon:', currentTelefon);
+            console.log('Zadaný kód:', smsKod);
 
             if (smsKod.length !== 4) {
+                console.error('Neplatná délka kódu');
                 alert('Zadejte 4-místný kód');
                 return;
             }
 
             try {
+                console.log('Volám overitSMSKod()...');
                 // Ověřit kód přes Supabase
                 const result = await overitSMSKod(currentTelefon, smsKod);
+                console.log('Výsledek overitSMSKod:', result);
 
                 if (!result.valid) {
                     alert('Chyba\n\n' + (result.error || 'Neplatný kód'));
@@ -449,16 +460,21 @@
                 }
 
                 // Načíst data farmáře
+                console.log('Volám nacistFarmarePoTelefonu()...');
                 const farmarResult = await nacistFarmarePoTelefonu(currentTelefon);
+                console.log('Výsledek nacistFarmarePoTelefonu:', farmarResult);
 
                 if (!farmarResult.success) {
+                    console.error('Nepodařilo se načíst data farmáře');
                     alert('Chyba\n\nNepodařilo se načíst data farmáře');
                     return;
                 }
 
                 // Uložit do localStorage
+                console.log('Ukládám do localStorage...');
                 localStorage.setItem('farmarLoggedIn', 'true');
                 localStorage.setItem('farmarData', JSON.stringify(farmarResult.data));
+                console.log('✅ ÚSPĚCH! Farmář přihlášen:', farmarResult.data);
 
                 alert(`Úspěch!\n\nByli jste úspěšně přihlášeni jako ${farmarResult.data.nazev_farmy}.\n\nV produkční verzi by se zde zobrazila administrace farmy.`);
 
