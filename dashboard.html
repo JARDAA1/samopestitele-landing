@@ -331,38 +331,39 @@
             cursor: pointer;
         }
 
-        .image-upload {
-            border: 2px dashed #e5e7eb;
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 0.75rem;
+            padding: 1rem;
+            background: var(--bg-light);
             border-radius: 8px;
-            padding: 2rem;
-            text-align: center;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .icon-item {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
+            background: white;
         }
 
-        .image-upload:hover {
+        .icon-item:hover {
             border-color: var(--primary);
-            background: var(--bg-light);
+            transform: scale(1.05);
         }
 
-        .image-upload input {
-            display: none;
-        }
-
-        .image-preview {
-            margin-top: 1rem;
-            display: none;
-        }
-
-        .image-preview.active {
-            display: block;
-        }
-
-        .image-preview img {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 8px;
-            object-fit: cover;
+        .icon-item.selected {
+            border-color: var(--primary);
+            background: #f0fdf4;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
         }
 
         .btn-primary {
@@ -507,26 +508,28 @@
                     </div>
                 </div>
 
+                <!-- Množství na skladě - ZAKOMENTOVÁNO
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Množství na skladě</label>
                         <input type="number" class="form-input" id="mnozstvi" placeholder="10" min="0" step="0.1">
                     </div>
+                </div>
+                -->
 
-                    <div class="form-group">
-                        <label class="form-label">Kategorie</label>
-                        <select class="form-select" id="kategorie">
-                            <option value="">-- Vyberte --</option>
-                            <option value="Zelenina">🥕 Zelenina</option>
-                            <option value="Ovoce">🍎 Ovoce</option>
-                            <option value="Mléčné výrobky">🥛 Mléčné výrobky</option>
-                            <option value="Vejce">🥚 Vejce</option>
-                            <option value="Maso">🥩 Maso</option>
-                            <option value="Med">🍯 Med</option>
-                            <option value="Pečivo">🥖 Pečivo</option>
-                            <option value="Jiné">📦 Jiné</option>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">Kategorie</label>
+                    <select class="form-select" id="kategorie">
+                        <option value="">-- Vyberte --</option>
+                        <option value="Zelenina">🥕 Zelenina</option>
+                        <option value="Ovoce">🍎 Ovoce</option>
+                        <option value="Mléčné výrobky">🥛 Mléčné výrobky</option>
+                        <option value="Vejce">🥚 Vejce</option>
+                        <option value="Maso">🥩 Maso</option>
+                        <option value="Med">🍯 Med</option>
+                        <option value="Pečivo">🥖 Pečivo</option>
+                        <option value="Jiné">📦 Jiné</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
@@ -537,17 +540,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">📸 Fotka produktu</label>
-                    <div class="image-upload" onclick="document.getElementById('imageInput').click()">
-                        <input type="file" id="imageInput" accept="image/*" onchange="previewImage(event)">
-                        <div id="uploadPlaceholder">
-                            <p style="font-size: 3rem; margin-bottom: 0.5rem;">📷</p>
-                            <p style="color: var(--text-gray);">Klikněte pro nahrání fotky</p>
-                            <p style="color: var(--text-gray); font-size: 0.875rem;">JPG, PNG (max 5 MB)</p>
-                        </div>
-                    </div>
-                    <div id="imagePreview" class="image-preview">
-                        <img id="previewImg" src="" alt="Náhled">
+                    <label class="form-label">🎨 Ikona produktu</label>
+                    <div class="icon-grid" id="iconGrid">
+                        <!-- Ikony budou vloženy pomocí JS -->
                     </div>
                 </div>
 
@@ -633,12 +628,14 @@
 
             container.innerHTML = products.map(product => `
                 <div class="product-item">
-                    <div class="product-info">
-                        <h4>${product.nazev}</h4>
-                        <div class="product-price">${product.cena} Kč / ${product.jednotka}</div>
-                        <div class="product-status">
-                            ${product.dostupnost ? '✅ Skladem' : '❌ Vyprodáno'}
-                            ${product.mnozstvi ? ` • ${product.mnozstvi} ${product.jednotka}` : ''}
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="font-size: 3rem;">${product.emoji || '📦'}</div>
+                        <div class="product-info">
+                            <h4>${product.nazev}</h4>
+                            <div class="product-price">${product.cena} Kč / ${product.jednotka}</div>
+                            <div class="product-status">
+                                ${product.dostupnost ? '✅ Skladem' : '❌ Vyprodáno'}
+                            </div>
                         </div>
                     </div>
                     <div class="product-actions">
@@ -652,34 +649,46 @@
         function showAddProduct() {
             document.getElementById('addProductModal').classList.add('active');
             document.body.style.overflow = 'hidden'; // Disable scroll when modal is open
+            initIconGrid(); // Inicializovat ikony při otevření modalu
         }
+
+        // Sada ikon pro produkty
+        const PRODUCT_ICONS = [
+            '🍅', '🥕', '🥒', '🌶️', '🫑', '🥔', '🧅', '🧄', '🥬', '🥦',
+            '🍄', '🌽', '🥗', '🍇', '🍈', '🍉', '🍊', '🍋', '🍌', '🍍',
+            '🥭', '🍎', '🍏', '🍐', '🍑', '🍒', '🍓', '🫐', '🥝', '🥥',
+            '🥚', '🥛', '🧀', '🧈', '🥩', '🍗', '🥓', '🍖', '🐟', '🍯',
+            '🍞', '🥖', '🥨', '🥐', '🥯', '🫓', '🥞', '🧇', '🥔', '🌾'
+        ];
+
+        let selectedIcon = null;
 
         function closeAddProductModal() {
             document.getElementById('addProductModal').classList.remove('active');
             document.body.style.overflow = ''; // Re-enable scroll
             document.getElementById('addProductForm').reset();
-            document.getElementById('imagePreview').classList.remove('active');
-            document.getElementById('uploadPlaceholder').style.display = 'block';
+            selectedIcon = null;
+            // Odznačit všechny ikony
+            document.querySelectorAll('.icon-item').forEach(item => {
+                item.classList.remove('selected');
+            });
         }
 
-        function previewImage(event) {
-            const file = event.target.files[0];
-            if (file) {
-                // Check file size (max 5 MB)
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('Soubor je příliš velký. Maximum je 5 MB.');
-                    event.target.value = '';
-                    return;
-                }
+        function initIconGrid() {
+            const iconGrid = document.getElementById('iconGrid');
+            iconGrid.innerHTML = PRODUCT_ICONS.map(icon =>
+                `<div class="icon-item" onclick="selectIcon('${icon}', event)">${icon}</div>`
+            ).join('');
+        }
 
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('previewImg').src = e.target.result;
-                    document.getElementById('imagePreview').classList.add('active');
-                    document.getElementById('uploadPlaceholder').style.display = 'none';
-                };
-                reader.readAsDataURL(file);
-            }
+        function selectIcon(icon, event) {
+            selectedIcon = icon;
+            // Odznačit všechny ikony
+            document.querySelectorAll('.icon-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            // Označit vybranou ikonu
+            event.target.classList.add('selected');
         }
 
         async function submitProduct(event) {
@@ -701,42 +710,15 @@
                 const popis = document.getElementById('popis').value.trim();
                 const cena = parseInt(document.getElementById('cena').value);
                 const jednotka = document.getElementById('jednotka').value;
-                const mnozstvi = document.getElementById('mnozstvi').value ? parseFloat(document.getElementById('mnozstvi').value) : null;
                 const kategorie = document.getElementById('kategorie').value || null;
                 const dostupnost = document.getElementById('dostupnost').checked;
-                const imageFile = document.getElementById('imageInput').files[0];
 
-                let obrazekUrl = null;
-
-                // Nahrát obrázek do Supabase Storage (pokud existuje)
-                if (imageFile) {
-                    const fileExt = imageFile.name.split('.').pop();
-                    const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
-                    const filePath = `produkty/${fileName}`;
-
-                    console.log('Nahrávám obrázek do Storage:', filePath);
-
-                    const { data: uploadData, error: uploadError } = await getSupabaseClient()
-                        .storage
-                        .from('produkty')
-                        .upload(filePath, imageFile);
-
-                    if (uploadError) {
-                        console.error('Chyba při nahrávání obrázku:', uploadError);
-                        alert('Chyba při nahrávání obrázku: ' + uploadError.message);
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = '✅ Přidat produkt';
-                        return;
-                    }
-
-                    // Získat veřejnou URL obrázku
-                    const { data: urlData } = getSupabaseClient()
-                        .storage
-                        .from('produkty')
-                        .getPublicUrl(filePath);
-
-                    obrazekUrl = urlData.publicUrl;
-                    console.log('Obrázek nahrán, URL:', obrazekUrl);
+                // Kontrola vybrané ikony
+                if (!selectedIcon) {
+                    alert('Vyberte prosím ikonu pro produkt');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '✅ Přidat produkt';
+                    return;
                 }
 
                 // Uložit produkt do databáze
@@ -748,10 +730,10 @@
                         popis,
                         cena,
                         jednotka,
-                        mnozstvi,
+                        mnozstvi: null, // Zakomentováno - nepoužíváme
                         kategorie,
                         dostupnost,
-                        obrazek_url: obrazekUrl,
+                        emoji: selectedIcon, // Uložit ikonu místo obrazku
                     })
                     .select()
                     .single();
