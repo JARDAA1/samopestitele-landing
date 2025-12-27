@@ -121,6 +121,23 @@
             margin-bottom: 1rem;
         }
 
+        .farmer-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .farmer-rating .stars {
+            color: #fbbf24;
+        }
+
+        .farmer-rating .rating-count {
+            color: var(--text-gray);
+            font-size: 1rem;
+        }
+
         .farmer-contact {
             display: flex;
             gap: 1rem;
@@ -389,6 +406,22 @@
                 }
 
                 farmer = data;
+
+                // Načíst hodnocení farmáře
+                const { data: ratings } = await getSupabaseClient()
+                    .from('hodnoceni')
+                    .select('hvezdicky')
+                    .eq('pestitel_id', farmerId);
+
+                if (ratings && ratings.length > 0) {
+                    const totalStars = ratings.reduce((sum, r) => sum + r.hvezdicky, 0);
+                    farmer.avgRating = (totalStars / ratings.length).toFixed(1);
+                    farmer.ratingCount = ratings.length;
+                } else {
+                    farmer.avgRating = null;
+                    farmer.ratingCount = 0;
+                }
+
                 displayFarmerInfo();
             } catch (error) {
                 console.error('Chyba:', error);
@@ -406,6 +439,12 @@
                     <div>📍 ${farmer.mesto || 'Neznámé místo'}</div>
                     ${farmer.telefon ? `<div>📞 ${farmer.telefon}</div>` : ''}
                 </div>
+                ${farmer.avgRating ? `
+                    <div class="farmer-rating">
+                        <span class="stars">⭐ ${farmer.avgRating}</span>
+                        <span class="rating-count">(${farmer.ratingCount} hodnocení)</span>
+                    </div>
+                ` : ''}
                 <div class="farmer-contact">
                     ${farmer.telefon ? `
                         <a href="tel:${farmer.telefon}" class="contact-btn">

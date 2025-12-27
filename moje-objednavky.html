@@ -352,6 +352,81 @@
             border-radius: 4px;
             margin-bottom: 2rem;
         }
+
+        /* Rating Section */
+        .rating-section {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .rating-title {
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 0.5rem;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .star {
+            cursor: pointer;
+            color: #d1d5db;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .star:hover,
+        .star.active {
+            color: #fbbf24;
+            transform: scale(1.1);
+        }
+
+        .rating-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .rating-display .stars {
+            color: #fbbf24;
+        }
+
+        .submit-rating-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submit-rating-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .submit-rating-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .rating-success {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -382,6 +457,7 @@
 
     <script>
         let allOrders = [];
+        let selectedRatings = {}; // Track selected ratings for each order
 
         // Načíst objednávky z localStorage (podle telefonu nebo bez autentizace zobrazit všechny nedávné)
         async function loadOrders() {
@@ -425,6 +501,15 @@
                         .eq('objednavka_id', order.id);
 
                     order.items = items || [];
+
+                    // Načíst hodnocení (pokud existuje)
+                    const { data: rating, error: ratingError } = await getSupabaseClient()
+                        .from('hodnoceni')
+                        .select('*')
+                        .eq('objednavka_id', order.id)
+                        .maybeSingle();
+
+                    order.rating = rating || null;
                 }
 
                 allOrders = orders;
@@ -581,7 +666,144 @@
                         </div>
                     </div>
                 ` : ''}
+
+                ${renderRatingSection(order)}
             `;
+        }
+
+        // Vykreslit sekci hodnocení
+        function renderRatingSection(order) {
+            console.log('🔍 renderRatingSection volána pro objednávku:', order.id, 'rating:', order.rating);
+
+            // Pokud už je ohodnoceno, zobrazit stávající hodnocení
+            if (order.rating) {
+                const stars = '⭐'.repeat(order.rating.hvezdicky);
+                return `
+                    <div class="detail-section">
+                        <div class="detail-title">⭐ Vaše hodnocení</div>
+                        <div class="rating-display">
+                            <span class="stars">${stars}</span>
+                            <span>(${order.rating.hvezdicky}/5)</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Pokud není ohodnoceno, zobrazit formulář pro hodnocení
+            return `
+                <div class="detail-section" style="background: #fef3c7; padding: 1rem; border-radius: 8px;">
+                    <div class="detail-title">⭐ Ohodnoťte farmáře</div>
+                    <div class="rating-section" id="rating-section-${order.id}">
+                        <div class="rating-title">Jak jste spokojeni s touto objednávkou?</div>
+                        <div class="star-rating" id="stars-${order.id}">
+                            ${[1, 2, 3, 4, 5].map(star => `
+                                <span class="star" data-value="${star}" onclick="selectRating(${order.id}, ${star})" onmouseover="hoverRating(${order.id}, ${star})" onmouseout="unhoverRating(${order.id})">⭐</span>
+                            `).join('')}
+                        </div>
+                        <button class="submit-rating-btn" id="submit-rating-${order.id}" onclick="submitRating(${order.id}, ${order.pestitel_id})" disabled>
+                            Odeslat hodnocení
+                        </button>
+                        <div style="margin-top: 0.5rem; font-size: 0.8rem; color: #666;">
+                            Debug: Objednávka #${order.id}, Farmář #${order.pestitel_id}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Vybrat hodnocení
+        function selectRating(orderId, rating) {
+            selectedRatings[orderId] = rating;
+            updateStarDisplay(orderId, rating);
+
+            // Povolit tlačítko odeslání
+            const submitBtn = document.getElementById(`submit-rating-${orderId}`);
+            if (submitBtn) {
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Aktualizovat zobrazení hvězdiček
+        function updateStarDisplay(orderId, rating) {
+            const starsContainer = document.getElementById(`stars-${orderId}`);
+            if (!starsContainer) return;
+
+            const stars = starsContainer.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        // Hover efekt na hvězdičky
+        function hoverRating(orderId, rating) {
+            if (selectedRatings[orderId]) return; // Pokud už je vybráno, neměnit při hoveru
+            updateStarDisplay(orderId, rating);
+        }
+
+        // Zrušit hover efekt
+        function unhoverRating(orderId) {
+            if (selectedRatings[orderId]) {
+                updateStarDisplay(orderId, selectedRatings[orderId]);
+            } else {
+                updateStarDisplay(orderId, 0);
+            }
+        }
+
+        // Odeslat hodnocení
+        async function submitRating(orderId, pestiteleId) {
+            const rating = selectedRatings[orderId];
+            if (!rating) return;
+
+            const submitBtn = document.getElementById(`submit-rating-${orderId}`);
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Odesílám...';
+
+            try {
+                const { data, error } = await getSupabaseClient()
+                    .from('hodnoceni')
+                    .insert({
+                        objednavka_id: orderId,
+                        pestitel_id: pestiteleId,
+                        hvezdicky: rating
+                    })
+                    .select()
+                    .single();
+
+                if (error) {
+                    console.error('Chyba při ukládání hodnocení:', error);
+                    alert('❌ Nepodařilo se uložit hodnocení. Zkuste to prosím znovu.');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Odeslat hodnocení';
+                    return;
+                }
+
+                // Zobrazit potvrzení
+                const ratingSection = document.getElementById(`rating-section-${orderId}`);
+                if (ratingSection) {
+                    const stars = '⭐'.repeat(rating);
+                    ratingSection.innerHTML = `
+                        <div class="rating-success">
+                            ✅ Děkujeme za vaše hodnocení! ${stars}
+                        </div>
+                    `;
+                }
+
+                // Aktualizovat order objekt
+                const order = allOrders.find(o => o.id === orderId);
+                if (order) {
+                    order.rating = data;
+                }
+
+            } catch (error) {
+                console.error('Chyba:', error);
+                alert('❌ Nepodařilo se uložit hodnocení. Zkuste to prosím znovu.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Odeslat hodnocení';
+            }
         }
 
         // Přepnout zobrazení detailu objednávky

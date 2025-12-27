@@ -205,6 +205,23 @@
             color: var(--text-gray);
         }
 
+        .farmer-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .farmer-rating .stars {
+            color: #fbbf24;
+        }
+
+        .farmer-rating .rating-count {
+            color: var(--text-gray);
+            font-size: 0.85rem;
+        }
+
         /* Map */
         .map-container {
             background: white;
@@ -473,6 +490,21 @@
 
                     farmer.products = products || [];
 
+                    // Načíst hodnocení farmáře
+                    const { data: ratings } = await getSupabaseClient()
+                        .from('hodnoceni')
+                        .select('hvezdicky')
+                        .eq('pestitel_id', farmer.id);
+
+                    if (ratings && ratings.length > 0) {
+                        const totalStars = ratings.reduce((sum, r) => sum + r.hvezdicky, 0);
+                        farmer.avgRating = (totalStars / ratings.length).toFixed(1);
+                        farmer.ratingCount = ratings.length;
+                    } else {
+                        farmer.avgRating = null;
+                        farmer.ratingCount = 0;
+                    }
+
                     // Vypočítat vzdálenost od uživatele
                     if (userLocation && farmer.gps_lat && farmer.gps_lng &&
                         (farmer.gps_lat !== 0 || farmer.gps_lng !== 0)) {
@@ -560,6 +592,12 @@
                         📍 ${farmer.mesto || 'Neznámé místo'}
                         ${farmer.distance !== null ? ` • ${farmer.distance.toFixed(1)} km` : ''}
                     </div>
+                    ${farmer.avgRating ? `
+                        <div class="farmer-rating">
+                            <span class="stars">⭐ ${farmer.avgRating}</span>
+                            <span class="rating-count">(${farmer.ratingCount})</span>
+                        </div>
+                    ` : ''}
                     ${farmer.products && farmer.products.length > 0 ? `
                         <div class="farmer-products">
                             ${farmer.products.map(p => `
@@ -588,6 +626,12 @@
                             <div class="popup-content">
                                 <div class="popup-title">${farmer.nazev_farmy || farmer.nazev || 'Farma'}</div>
                                 <div class="popup-city">📍 ${farmer.mesto || 'Neznámé místo'}</div>
+                                ${farmer.avgRating ? `
+                                    <div class="farmer-rating">
+                                        <span class="stars">⭐ ${farmer.avgRating}</span>
+                                        <span class="rating-count">(${farmer.ratingCount})</span>
+                                    </div>
+                                ` : ''}
                                 <button class="popup-btn" onclick="viewFarmerDetail(${farmer.id})">
                                     Zobrazit produkty
                                 </button>
