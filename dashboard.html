@@ -469,6 +469,19 @@
                 </div>
             </div>
         </div>
+
+        <div class="info-section" style="border: 2px solid #ef4444; background: #fef2f2;">
+            <h2 style="color: #dc2626;">⚙️ Nastavení účtu</h2>
+            <div style="background: white; padding: 1.5rem; border-radius: 8px; margin-top: 1rem;">
+                <h3 style="color: #dc2626; margin-bottom: 0.5rem;">⚠️ Nebezpečná zóna</h3>
+                <p style="color: var(--text-gray); margin-bottom: 1rem;">
+                    Odstranění účtu je nevratné. Vaše osobní údaje budou anonymizovány, ale název farmy a historie objednávek zůstanou zachovány kvůli zákazníkům.
+                </p>
+                <button class="logout-btn" style="background: #dc2626; border: 2px solid #991b1b;" onclick="smazatUcet()">
+                    🗑️ Odstranit účet
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Modal pro přidání produktu -->
@@ -879,6 +892,48 @@
                 localStorage.removeItem('farmarLoggedIn');
                 localStorage.removeItem('farmarData');
                 window.location.href = 'prodejna.html';
+            }
+        }
+
+        async function smazatUcet() {
+            const potvrzeni1 = confirm('⚠️ VAROVÁNÍ: Opravdu chcete odstranit svůj účet?\n\nTato akce:\n• Anonymizuje vaše osobní údaje\n• Deaktivuje všechny vaše produkty\n• Je NEVRATNÁ\n\nHistorie objednávek a název farmy zůstanou zachovány pro zákazníky.');
+
+            if (!potvrzeni1) return;
+
+            const potvrzeni2 = prompt('Pro potvrzení odstranění účtu napište: SMAZAT');
+
+            if (potvrzeni2 !== 'SMAZAT') {
+                alert('Odstranění účtu bylo zrušeno.');
+                return;
+            }
+
+            try {
+                const farmarData = JSON.parse(localStorage.getItem('farmarData'));
+                if (!farmarData || !farmarData.id) {
+                    alert('Chyba: Nelze načíst data farmáře');
+                    return;
+                }
+
+                // Zavolat SQL funkci pro anonymizaci farmáře
+                const { data, error } = await getSupabaseClient()
+                    .rpc('anonymizovat_farmare', { p_pestitel_id: farmarData.id });
+
+                if (error) {
+                    console.error('Chyba při mazání účtu:', error);
+                    alert('❌ Nepodařilo se odstranit účet. Zkuste to prosím znovu nebo kontaktujte podporu.');
+                    return;
+                }
+
+                // Vymazat local storage a přesměrovat
+                localStorage.removeItem('farmarLoggedIn');
+                localStorage.removeItem('farmarData');
+
+                alert('✅ Váš účet byl úspěšně odstraněn. Vaše osobní údaje byly anonymizovány.');
+                window.location.href = 'index.html';
+
+            } catch (error) {
+                console.error('Chyba:', error);
+                alert('❌ Nepodařilo se odstranit účet. Zkuste to prosím znovu.');
             }
         }
 

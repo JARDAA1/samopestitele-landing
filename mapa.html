@@ -452,7 +452,8 @@
             try {
                 const { data, error } = await getSupabaseClient()
                     .from('pestitele')
-                    .select('*');
+                    .select('*')
+                    .eq('smazano', false); // Nezobrazovat smazané farmáře
 
                 if (error) {
                     console.error('Chyba při načítání farmářů:', error);

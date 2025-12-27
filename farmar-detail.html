@@ -391,6 +391,7 @@
                     .from('pestitele')
                     .select('*')
                     .eq('id', farmerId)
+                    .eq('smazano', false) // Nezobrazovat smazané farmáře
                     .single();
 
                 if (error || !data) {
@@ -399,6 +400,7 @@
                         <div class="empty-state">
                             <div class="empty-icon">⚠️</div>
                             <h3>Farmář nebyl nalezen</h3>
+                            <p>Tento farmář již neexistuje nebo byl odstraněn.</p>
                             <a href="mapa.html" class="contact-btn">← Zpět na mapu</a>
                         </div>
                     `;
